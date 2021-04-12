@@ -1,0 +1,7 @@
+# Ignore Python bytecode caching.
+/__pycache__/
+
+# Ignore build files.
+*.3mf
+*.stl
+
