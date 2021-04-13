@@ -1,6 +1,9 @@
 # Ignore Python bytecode caching.
 /__pycache__/
 
+# Ignore IDE configuration files.
+/.vscode/
+
 # Ignore build files.
 *.3mf
 *.stl
