@@ -69,8 +69,9 @@ class WallMount:
 
             .loft()
 
-            .edges("(not >Y) and (>X or <X)")
-            .chamfer(m.base.chamfer) # Not a fillet, as that would need low support and not print well.
+            # Edge treatment. Not with fillets, as that would need low support and not print well.
+            .edges("not |X").edges("(not <Y) and (not >Y)")
+            .chamfer(m.base.chamfer)
         )
 
         xmount_plug = (
@@ -87,7 +88,9 @@ class WallMount:
 
         self.model = (
             base_shape
-            .union(xmount_plug)
+            # TODO: In the following, "clean = True" leads to non-manifold shapes if the chamfers 
+            # along the base edges are much smaller than those at the stem. To be reported and fixed.
+            .union(xmount_plug, clean = False)
         )
 
 
@@ -99,14 +102,14 @@ cq.Workplane.part = utilities.part
 measures = Measures(
     base = Measures(
         depth = 15.00,
-        chamfer = 2.80,
+        chamfer = 0.8,
         back = Measures(
             width = xmp.measures.plate.width,
             height = 60.00
         ),
         front = Measures(
             width = xmp.measures.plate.width,
-            height = xmp.measures.stem.depth,
+            height = xmp.measures.lower_stem.depth,
             angle = -14, # Relative to being parallel to the back surface and wall. Positive for up.
             height_pos_offset = -10.00, # Relative to the center of the back surface.
         ),
