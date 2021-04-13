@@ -40,11 +40,20 @@ class XMountSocket:
             [SimpleNamespace](https://docs.python.org/3/library/types.html#types.SimpleNamespace) 
             object.
 
-        .. todo:: Support generating a positive X-Mount part. It should be possible to select with 
+        .. todo:: Support generating a positive X-Mount socket. It should be possible to select with 
             a parameter (in the usual Measures object) if to generate a hole cutter or a positive 
             part.
         .. todo:: Support generating only a cutter for the X-Mount hole, which can be used to cut 
             an X-Mount socket into a phone case etc..
+        .. todo:: Create a variant that is much wider and also 10 mm deeper and instead of 
+            plastic for the load-bearing rails uses a piece of 1.0 - 1.5 mm stainless steel 
+            sheet metal. That should be a stripe of 20 mm width on both sides, or ideally as wide 
+            as the phone, and would be glued to the 3D printed part with construction glue. The 
+            3D printed part should prepare that by providing space for the construction glue but 
+            also the spacers to position the metal piece in the correct position.
+              This variant would be much more durable. 3D printing an X-Mount socket might otherwise 
+            not lead to plastic parts that are strong enough, as the rails are only 1.0-1.5 mm thick 
+            in the original part.
         .. todo:: Support holes for magnets (of configurable shape) in the back of the part, where 
             the original X-Mount part also has its magnet.
         """
