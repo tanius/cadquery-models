@@ -40,6 +40,9 @@ class XMountSocket:
             [SimpleNamespace](https://docs.python.org/3/library/types.html#types.SimpleNamespace) 
             object.
 
+        .. todo:: Add the X-Mount cutout for mounting an X-Mount plug.
+        .. todo:: Add the side holes in the X-Mount socket for the orange security clips.
+        .. todo:: Create a separate design for the orange security clips.
         .. todo:: Support generating a positive X-Mount socket. It should be possible to select with 
             a parameter (in the usual Measures object) if to generate a hole cutter or a positive 
             part.
@@ -53,7 +56,8 @@ class XMountSocket:
             also the spacers to position the metal piece in the correct position.
               This variant would be much more durable. 3D printing an X-Mount socket might otherwise 
             not lead to plastic parts that are strong enough, as the rails are only 1.0-1.5 mm thick 
-            in the original part.
+            in the original part. To help produce this variant, create a template that can be 
+            printed or 3D printed and glued on sheet metal to help cutting it to shape.
         .. todo:: Support holes for magnets (of configurable shape) in the back of the part, where 
             the original X-Mount part also has its magnet.
         """
@@ -197,6 +201,7 @@ measures = Measures(
     depth_step_1 = 64.65, # At bottom of part. Ignores belt loop attachment depth.
     depth_step_2 = 55.00, # At top of part.
     height_step_1 = 0.90,
+    # Height is 3.90 for the newer Armor-X Type-M socket design, 4.90 for the older.
     height_step_2 = 3.90, # Ignores clip block height.
     corner_radius = 8.20,
     edge_fillet = 5.0, # Edges around the top of the part.
