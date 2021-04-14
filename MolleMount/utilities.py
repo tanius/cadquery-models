@@ -1,4 +1,16 @@
 import cadquery as cq
+from math import tan, radians
+import logging
+
+log = logging.getLogger(__name__)
+
+# Do-nothing definition of show_object() when not available, to prevent error messages when 
+# including this module from another module. Obviously in such cases, show_object() calls inside 
+# this file have no effect, but you'll want to control object visibility from the top level file anyway.
+if "show_object" not in globals():
+    def show_object(*args, **kwargs):
+        pass
+
 
 def combine_wires(self):
     """
@@ -100,3 +112,70 @@ def part(self, part_class, measures):
     return self.newObject(
         part.model.objects
     )
+
+
+def csk_face_hole(self, diameter, csk_diameter, csk_angle, depth = None, offset = None):
+    """
+    Utility method to create a hole in a face or set of faces, vertical to the face and using the 
+    given offsets.
+
+    When called, the stack must contain the face or set of faces to drill into.
+    Technique as found at: https://github.com/CadQuery/cadquery/issues/713#issuecomment-814519752
+    """
+
+    context_solid = self.findSolid()
+    if depth is None:
+        depth = self.largestDimension()
+    if offset is None:
+        offset = (0.0, 0.0)
+
+    for face in self.objects:
+        if isinstance(face, cq.Face):        
+            origin = face.Center()
+            normal = face.normalAt()
+
+            if normal.normalized() == cq.Vector(0, 0, 1):
+                x_dir = cq.Vector(1, 0, 0)
+            elif normal.normalized() == cq.Vector(0, 0, -1):
+                x_dir = cq.Vector(-1, 0, 0)
+            else:
+                # Guaranteed to be non-(0,0,0) as we caught and treated these cases above.
+                x_dir = cq.Vector(0, 0, 1).cross(normal)
+
+            log.info("origin = %s", origin)
+            log.info("normal = %s", normal)
+            log.info("x_dir = %s", x_dir)
+
+            plane = cq.Plane(origin, x_dir, normal)
+            plane.setOrigin2d(*offset)
+            bore_dir = normal.multiply(-1)
+            center = plane.toWorldCoords((0, 0, 0))
+
+            hole = cq.Solid.makeCylinder(0.5 * diameter, depth, center, bore_dir)
+            csk_radius = 0.5 * csk_diameter
+            csk_height = csk_radius / tan(radians(0.5 * csk_angle))
+            csk = cq.Solid.makeCone(csk_radius, 0.0, csk_height, center, bore_dir)
+            csk_hole = hole.fuse(csk)
+
+            #show_object(csk_hole)
+
+            context_solid = context_solid.cut(csk_hole)
+
+    return self.newObject([context_solid])
+
+
+def test_csk_face_hole():
+    cq.Workplane.csk_face_hole = csk_face_hole
+
+    model = (
+        cq.Workplane("XY")
+        .box(10, 10, 10)
+
+        .faces(">Z or >X")
+        .csk_face_hole(diameter = 3, csk_diameter = 5, csk_angle = 90, depth = 3, offset = (2, 0))
+    )
+
+    show_options = {"color": "lightgray", "alpha": 0}
+    show_object(model, name = "model", options = show_options)
+
+#test_csk_face_hole()

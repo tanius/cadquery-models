@@ -25,11 +25,35 @@ class XMountPlug:
         A parametric plug for the Armor-X X-Mount Type-M mounting system.
 
         Multiple variants of plugs are or will be supported, and can be chosen by adapting the 
-        parameters.
+        parameters. With the default parameters and 3D printing in PETG, it needs a relatively 
+        strong but still acceptable bending force on the lever to release the device. You can 
+        adjust this after printing by successively sanding down the clip ridge and testing until 
+        you have a part with the desired holding force.
         
         During part creation, the origin is at "plate top, plate center". When the part is 
         returned, the origin is however at "stem bottom, stem center" because that helps dependent 
         designs to place the part.
+
+        Status: Already includes all corrections from the second test print.
+
+        3D printing: (1) Print this on a side surface (YZ plane in the model's original rendering), as 
+        only that lays the filament so that pushing the clip does not split layers. Everything else 
+        will result in a part that is not strong enough. (2) Support is only needed inside the cutout 
+        of the holder's plate. Carefully remove every last bit of support material from there 
+        afterwards, as the plug will otherwise not fit in. (3) It is better to print the whole 
+        part raised into the air by 2.0 mm using support, as that prevents the elephant foot effect. 
+        Otherwise, the plate will be too thick on one side and has to be sanded down to fit into 
+        an X-Mount socket. A raise of 2.0 mm is the minimum that guarantees that the support can 
+        later be broken off in one piece. (4) A good material for this is PETG. Don't print it too 
+        hot, as that will make it brittle so that the lever will break rather than bend. 243 °C is 
+        the perfect spot for MyDroid filament, for example, while 250 °C is too hot.
+
+        Failure modes: When printed on a side surface (YZ plane) in PETG at 245 °C, a 2.5 mm thick 
+        lever will bend nicely and not break for at least 10 mm way of travel. A 2.3 mm thick 
+        mounting plate will be the weak point. But it can take 30-40 kg of pulling force before 
+        breaking, which should be enough for mounting a mobile device. And even then, the break line 
+        will not be between two layers, so it's the plastic itself that is breaking, not the layers 
+        delaminating.
 
         :param workplane: The CadQuery workplane to create this part on. You can provide a workplane 
             with any rotation and offset, and the part will be mounted on it, with its origin at 
@@ -39,18 +63,53 @@ class XMountPlug:
             [SimpleNamespace](https://docs.python.org/3/library/types.html#types.SimpleNamespace) 
             object.
 
-        .. todo:: Add the guiding chamfers at the back edges of the upper stem again. They are 
-            probably needed to guide the plug into the socket.
-        .. todo:: Attach the clip lower, and to compensate let the clip shape go up in a 90° bend 
-            below the ridge part. The lever would still be attached in its current position, 
-            directly to the ridge. That change allows easier removal of support in the variant 
-            printed upside down, and allows to use the 45° chamfer between upper and lower stem 
-            as the default design. With this, the plug part will have less friction with the 
-            socket and will not get stuck when trying to slide it.
+        Optional TODOs for later:
+
+        .. todo:: Add something to the end of the lever, such as a near-vertical piece with a circular 
+            recess, that simplifies pushing the lever with a single finger to open it when grabbing 
+            the device with two other fingers from the top to release it. That enabled one-hand 
+            use of the mechanism.
+        .. todo:: Add little protruding dots or other elements on the grip surface of the clip 
+            lever to provide friction for better grip.
+        .. todo:: Add another horizontal piece to the end of the lever, to allow better downward 
+            pressure without gliding off with the finger. Or probably better not, as that would 
+            interfere with the proposal of adding a part that helps operating the lever from the 
+            top edge of the device.
+        .. todo:: Create a parameter for ridge top position relative to the top of the plate. 
+            Because that's what one wants to configure, while clip height position etc. would be 
+            dependent on that. Or even better, make the parameter for configuring locking overlap 
+            of the ridge with the counterpart, i.e. necessary ridge movement for unlocking.
+        .. todo:: Support creating dummy objects for mobile device and wall to be able to simulate 
+            if the device will fit and can be mounted without hitting the wall. The dummy objects 
+            should be shown transparent by default.
+        .. todo:: Introduce a parameter clip.ridge_depth_pos to position the top of the ridge. This 
+            is an important measure, but currently has to be given indirectly by specifying both 
+            clip.straight_depth and clip.ridge_base_depth.
+        .. todo:: Instead of upper and lower stem, have only one stem but also cutters for cutting 
+            the rail outlines into that one stem. That's simpler, avoiding all the issues of 
+            knowing where the clip will meet the stems.
+        .. todo:: Create a variant without a lever and where the clip ridge has two 45° angles. 
+            It is operated by sliding the device in and out with some force. Of course it holds 
+            not very tightly to the device then, but for some types of indoor holders that's fine, 
+            and it means that operating the mechanism is faster and more comfortable.
+        .. todo:: Create a variant with a M3 countersunk bolt going through the stem to mount it 
+            somewhere, with the bolt head flush with the bottom of the cutout. An M3 countersunk 
+            bolt will fit in there without having to enlarge the hole.
+        .. todo: Create a variant with a hex bolt embedded, flush with the cutout bottom. Allows 
+            tensioned mechanisms as seen in the Armor-X suction cup holder. An M3 or M4 hex bolt 
+            will fit in the cutout without having to enlarge it.
+
+        Optional TODOs for much later:
+
+        .. Add a fillet below the clip lever, where it joins with the stem. That will protect 
+            against permanent bending of the lever. Permanent bending was observed at this point.
+        .. todo:: Create a variant using a clip made from a spring steel plate rather than from 
+            bending plastic. That should be much more durable. However, even the current plastic 
+            variant is quite ok.
         .. todo:: Create a variant that can be printed upside down, with the plate surface on the 
             print bed. That is necessary if the typical damage mode for parts printed on the side 
             is from shearing the layers apat where the plate meets the stem. The only change needed 
-            for that is a gradual change between upper and lower stem width, so be printable without 
+            for that is a gradual change between upper and lower stem width, to be printable without 
             support. That is best achieved with appropriately shaped cutters and only one stem 
             (see todo item below). The clip can be configured more narrow and will then not 
             interfere with the change in stem width.
@@ -67,26 +126,6 @@ class XMountPlug:
             This variant should be much more durable, as the current one translates rattling on the 
             mobile device in its holder into shear action between the layers at the section where 
             the plate meets the stem.
-        .. todo:: Create a variant using a clip made from a spring steel plate rather than from 
-            bending plastic. That should be much more durable.
-        .. todo:: Instead of upper and lower stem, have only one stem but also cutters for cutting 
-            the rail outlines into that one stem. That's simpler, avoiding all the issues of 
-            knowing where the clip will meet the stems.
-        .. todo:: Create a variant with a M3 countersunk bolt going through the stem to mount it 
-            somewhere, with the bolt head flush with the bottom of the cutout. An M3 countersunk 
-            bolt will fit in there without having to enlarge the hole.
-        .. todo: Create a variant with a hex bolt embedded, flush with the cutout bottom. Allows 
-            tensioned mechanisms as seen in the Armor-X suction cup holder. An M3 or M4 hex bolt 
-            will fit in the cutout without having to enlarge it.
-        .. todo:: Support creating dummy objects for mobile device and wall to be able to simulate 
-            if the device will fit and can be mounted without hitting the wall. The dummy objects 
-            should be shown transparent by default.
-        .. todo:: Support to create the straight part and lever part of the clip with different 
-            thicknesses. That allows to make the straight part more suited for bending, while 
-            keeping the lever part stiff.
-        .. todo:: Introduce a parameter clip.ridge_depth_pos to position the top of the ridge. This 
-            is an important measure, but currently has to be given indirectly by specifying both 
-            clip.straight_depth and clip.ridge_depth.
         """
 
         cq.Workplane.combine_wires = utilities.combine_wires
@@ -139,6 +178,12 @@ class XMountPlug:
             .close()
             .extrude(-m.plate.height)
 
+            # Chamfer the lower back edge to help guiding the plate into the X-Mount socket.
+            # Using corner radius for this is intended, in order to achieve a guide effect for the 
+            # whole front edge incl. around the rounded corners.
+            .edges("<Z and >Y")
+            .chamfer(length = m.plate.chamfer, length2 = m.plate.corner_radius)
+
             # Round the corners of the short end of the cutout.
             .edges("|Z and (not <Y) and (not >Y)")
             .fillet(m.cutout.corner_radius)
@@ -147,6 +192,7 @@ class XMountPlug:
             .edges("|Z and (<X or >X)")
             .fillet(m.plate.corner_radius)
 
+            # Chamfer all around the upper edges.
             .edges(">Z")
             .chamfer(m.plate.chamfer)
         )
@@ -173,13 +219,22 @@ class XMountPlug:
 
         upper_stem = (
             cq.Workplane("XY")
-            .box(m.upper_stem.width, m.upper_stem.depth, m.upper_stem.height, centered = [True, False, False])
+            .box(m.upper_stem.width, m.upper_stem.upper_depth, m.upper_stem.height, centered = [True, False, False])
             .translate([
                 0,
                 -0.5 * m.plate.depth + m.upper_stem.depth_pos,
                 -m.plate.height - m.upper_stem.height
             ])
             .cut(cutout)
+
+            # Chamfering the vertical back edges as guides when sliding into the X-Mount socket.
+            .edges("|Z and >Y")
+            .chamfer(m.upper_stem.corner_chamfer)
+
+            # Chamfering the lower back edge to adjust to the required lower depth measure.
+            .edges("|X and >Y and <Z")
+            .chamfer(length = m.upper_stem.upper_depth - m.upper_stem.lower_depth, length2 = 0.99 * m.upper_stem.height)
+            #.fillet(- max(m.upper_stem.upper_depth - m.upper_stem.lower_depth, 0.99 * m.upper_stem.height))
         )
 
         lower_stem = (
@@ -192,7 +247,7 @@ class XMountPlug:
             ])
             .cut(cutout)
 
-            .edges("|Z")
+            .edges("|Z and (<X or >X)")
             .chamfer(m.lower_stem.corner_chamfer)
         )
 
@@ -232,22 +287,6 @@ class XMountPlug:
                     angleDegrees = -m.clip.lever_angle
                 )
             )
-            # Clip ridge.
-            # TODO: Adjust the clip ridge to be of limited widt, with a 45° start from the sides 
-            # to be 3D printable without support.
-            # .add(
-            #     clip_plane
-            #     # Draw first the inclined and then the vertical slope of the ridge element.
-            #     .polyline([
-            #         # Back bottom point.
-            #         (m.clip.height_pos - m.clip.thickness, m.clip.straight_depth),
-            #         # Top of ridge point.
-            #         (m.clip.height_pos - m.clip.thickness - m.clip.ridge_height, m.clip.straight_depth - m.clip.ridge_depth),
-            #         # Front bottom point.
-            #         (m.clip.height_pos - m.clip.thickness, m.clip.straight_depth - m.clip.ridge_depth)
-            #     ])
-            #     .close()
-            # )
 
             .combine_wires()
             .toPending()
@@ -270,11 +309,11 @@ class XMountPlug:
                     # Back bottom point.
                     (m.clip.height_pos, m.clip.straight_depth),
                     # Top of ridge point at back.
-                    (m.clip.height_pos - m.clip.ridge_height, m.clip.straight_depth - m.clip.ridge_depth),
+                    (m.clip.height_pos - m.clip.ridge_height, m.clip.straight_depth - m.clip.ridge_base_depth + m.clip.ridge_top_depth),
                     # Top of ridge point at front.
-                    (m.clip.height_pos - m.clip.ridge_height, m.clip.straight_depth - m.clip.ridge_depth - 0.1),
+                    (m.clip.height_pos - m.clip.ridge_height, m.clip.straight_depth - m.clip.ridge_base_depth),
                     # Front bottom point.
-                    (m.clip.height_pos, m.clip.straight_depth - m.clip.ridge_depth)
+                    (m.clip.height_pos, m.clip.straight_depth - m.clip.ridge_base_depth)
                 ])
                 .close()
                 .extrude(0.5 * m.clip.ridge_width, both = True)
@@ -326,10 +365,14 @@ cq.Workplane.part = utilities.part
 measures = Measures(
     plate = Measures(
         width = 20.40,
-        depth = 22.40,
-        # Original X-Mount height 1.90 - 2.00. Max. 2.55 for zero-play fit in the socket. But better 
-        # a bit more and then grinding down the plate with sandpaper than a wobbly mount.
-        height = 2.60,
+        depth = 22.20, # Corrected from 22.40, which did not fit in.
+        # X-Mount plate heights:
+        # – As found in original plugs / mounts: 1.85 - 2.00 mm. 4.03 - 1.56 = 
+        # – Available space in X-Mount Type-M v1 sockets: 2.20 - 2.26 mm. Good plate height up to 2.15 mm.
+        # – Available space in X-Mount Type-M v2 sockets: 2.55 mm. Good plate height up to 2.40 mm.
+        # The v1 sockets are chosen as our standard, as all available original plates mount in there 
+        # with minimum wiggle room. Accordingly, we use ~2.15 mm plate thickness.
+        height = 1.93, # Prints as 2.12, which is perfect (easy gliding, no play).
         slot_width = 1.30,
         slot_depth = 8.25,
         slot_width_pos = 2.55,
@@ -339,15 +382,17 @@ measures = Measures(
     cutout = Measures(
         width_1 = 10.00,
         width_2 = 7.40,
-        depth = 9.70,
+        depth = 10.50, # Corrected from 9.70, which was too short to fit.
         height = 3.75,
         corner_radius = 2.80
     ),
     upper_stem = Measures(
         depth_pos = 0.00, # From front edge of plate. X-Mount original uses 1.20.
         width = 13.85,
-        depth = 15.50,
-        height = 1.70 # 1.70 to be flush with clip. Min. 1.50 to provide space for sliding into the mount socket.
+        upper_depth = 19.30,
+        lower_depth = 15.50, # Same as lower stem depth.
+        height = 2.97, # Making it flush with the clip. Min. 1.50 to provide space for sliding into the mount socket.
+        corner_chamfer = 2.50
     ),
     lower_stem = Measures(
         depth_pos = 0.00, # From front edge of plate.
@@ -356,20 +401,30 @@ measures = Measures(
         # Constraint 1: upper_stem.height + lower_stem.height ≥ 1.70 to accommodate cutout.height.
         # Constraint 2: upper_stem.height + lower_stem.height ≥ 9.00 for the clip's horizontal 
         # part (up to the clip ridge) to not hit a flat surface below it while unlocking.
-        height = 6.30,
+        height = 5.70,
         corner_chamfer = 3.00
     ),
     clip = Measures(
         width = 20.40, # Same as plate.width. 
-        thickness = 2.50, # Measured 2.43 - 2.50 depending on the part.
+        thickness = 2.30, # Good for PETG full-width levers. Measured 2.43 - 2.50 on original X-Mount parts, depending on the part.
         chamfer = 0.80,
-        height_pos = 4.30, # From upper face of baseplate to upper face of clip.
-        straight_depth = 5.00, # Necessarily horizontal section, from the end of the plate outline to the end of the clip ridge.
+        # height_pos = 4.90 and ridge_height = 2.30 give a locking overlap of 1.1 mm of the ridge, 
+        # which is teh right amount of force for locking / unlocking with a 2.30 mm PETG lever.
+        height_pos = 4.90, # From upper face of baseplate to upper face of clip.
+        straight_depth = 7.25, # Necessarily horizontal section, from the end of the plate outline to the end of the clip ridge.
         lever_length = 15.00, # Of a rectangular cross-section shape that can be merged with the rest.
         lever_angle = 45,
         ridge_width = 13.50, # Max. 13.90. Original X-Mount has 12.70.
         ridge_height = 2.30, # Max. 3.80 to reach the bottom of the socket counterpart when aligned parallel and touching.
-        ridge_depth = 2.40
+        # Sufficient ridge top depth instead of a pointy ridge means the ridge cannot be worn down 
+        # as easily, and will still work when worn a bit.
+        ridge_top_depth = 1.50,
+        ridge_base_depth = 4.1
+
+        # Another good clip option: height_pos = 4.30, ridge_height = 1.10, thickness = 2.30. With 
+        # this, the clip is under slight tension when clipped in, stabilizing the phone in the 
+        # holder. Also the opening and closing force is right with PETG. In the original X-Mount, 
+        # the clip also does only move 1.10 - 1.30 mm, so that seems enough.
     )
 )
 

@@ -20,21 +20,28 @@ class WallMount:
         """
         A parametric wall mount for mobile devices, providing an X-Mount Type-M plug.
 
-        Print on a side surface (XY plane in the model's original rendering), as only that lays
-        the filament so that pushing the clip does not split layers. Everything else will result 
-        in a part that is not strong enough. To facilitate printing in that orientation with 
-        minimum support, the default measures make the part only as wide as the X-Mount plate.
+        3D printing: See part XMountPlug. Like that, this part is designed to be printed on one 
+        side (XY plane).
 
         :param workplane: The CadQuery workplane to create this part on.
         :param measures: The measures to use for the parameters of this design. Expects a nested 
             [SimpleNamespace](https://docs.python.org/3/library/types.html#types.SimpleNamespace) 
             object.
 
-        .. todo:: Implement drilling the holes into the holder. A good template for the technique 
-            can be seen at https://github.com/CadQuery/cadquery/issues/713#issuecomment-814519752 .
-            It would be adapted to drill a cskHole() into the center of the face, with an offset 
-            and offset angle applied.
+        .. todo:: Add a second part above the top of the current wall holder, with a recess for the 
+            top edge of the mobile device and its case. This is to help mounting the device into the 
+            holder, by holding the top into the recess, then pushing on the back, and sliding the 
+            device downwards. However, in this design the new part blocks the space over the 
+            top of the device so that removing it with one hand becomes impossible. To compensate, 
+            no clip lever should be used, instead the clip would be operated by sliding the device 
+            in and out with some force.
+        .. todo:: Adjust the base so that the gap to the lever is so small that bending 
+            that lever will allow to unlock the device but not break or permanently deform the 
+            lever. For the default lever of the X-Mount plug that would be approx. 5 mm way of 
+            travel, as more will cause permanent bending (assuming printing in PETG).
         """
+
+        cq.Workplane.csk_face_hole = utilities.csk_face_hole
 
         # workplane is unused while building the model, and only utilized towards the end 
         # to position the model. Because to keep the code simple, CAD models should be able to 
@@ -72,17 +79,30 @@ class WallMount:
             # Edge treatment. Not with fillets, as that would need low support and not print well.
             .edges("not |X").edges("(not <Y) and (not >Y)")
             .chamfer(m.base.chamfer)
+
+            # Drill the upper mount hole.
+            .faces("(not |Y) and (not |X)").faces(">Z")
+            .csk_face_hole(
+                diameter = m.base.bolt_holes.hole_size, 
+                csk_diameter = m.base.bolt_holes.head_size,
+                csk_angle = m.base.bolt_holes.head_angle,
+                offset = (0, m.base.bolt_holes.upper_hole_offset)
+            )
+
+            # Drill the lower mount hole.
+            .faces("(not |Y) and (not |X)").faces("<Z")
+            .csk_face_hole(
+                diameter = m.base.bolt_holes.hole_size, 
+                csk_diameter = m.base.bolt_holes.head_size,
+                csk_angle = m.base.bolt_holes.head_angle,
+                offset = (0, m.base.bolt_holes.lower_hole_offset)
+            )
         )
 
         xmount_plug = (
             cq.Workplane()
             .copyWorkplane(base_shape.workplaneFromTagged("xmount_plug_interface"))
             .part(xmp.XMountPlug, xmp.measures)
-            
-            #.rotate((-1, 0, 0), (1, 0, 0), 90)
-            # TODO: Rotate the X-Mount according to the inclination of the front surface. The 
-            # most comfortable solution would be to create the X-Mount plug on an inclined workplane. 
-            # That option has to be implemented in xmount_plug.py first.
         )
         # show_object(xmount_plug, name = "xmount_plug", options = {"color": "yellow", "alpha": 0.8})
 
@@ -105,20 +125,20 @@ measures = Measures(
         chamfer = 0.8,
         back = Measures(
             width = xmp.measures.plate.width,
-            height = 60.00
+            height = 75.00
         ),
         front = Measures(
             width = xmp.measures.plate.width,
             height = xmp.measures.lower_stem.depth,
             angle = -14, # Relative to being parallel to the back surface and wall. Positive for up.
-            height_pos_offset = -10.00, # Relative to the center of the back surface.
+            height_pos_offset = 0.00, # Relative to the center of the back surface.
         ),
         bolt_holes = Measures(
-            lower_hole_pos = 10.00, # From lower end of part.
-            upper_hole_pos = 10.00, # From upper end of part.
+            upper_hole_offset = 5.00, # Vertical offset from center of face.
+            lower_hole_offset = 0.00, # Vertical offset from center of face.
             hole_size = 4.5, # Good for 4 mm wood screws.
-            headhole_size = 7.5, # TODO
-            head_angle = 90 # Suitable for wood screws.
+            head_size = 8.6, # Good for 4 mm wood screws.
+            head_angle = 90 # Suitable for wood screws with countersunk heads.
         )
     ) 
 )
