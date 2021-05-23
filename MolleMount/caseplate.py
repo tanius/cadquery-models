@@ -3,20 +3,35 @@ import cadquery.selectors as cqs
 import logging, importlib
 from types import SimpleNamespace as Measures
 
+# A plate for the Fansteck Galaxy Note9 case providing a Mollemount interface.
+
 log = logging.getLogger(__name__)
 
-class Backplate:
+class Caseplate:
 
     def __init__(self, workplane, measures):
         """
-        A simple, parametric protective backplate for mobile devices or their cases, with a cutout 
-        for an Armor-X X-Mount receptable glued to the device.
+        A simple, parametric backplate for cases of smartphones and phablets, adding a Mollemount 
+        interface to the case and also adding an extra level of protection to cases that use only 
+        thin material on the backside.
+
+        Mollemount is an open design mount system for smartphones and other mobile devices, 
+        compatible with the U.S. military PALS / MOLLE system.
+
+        The initial parameters make this suitable for the following case model: Fansteck case for 
+        Samsung Galaxy Note9, and identical cases from other traders. As offered at:
+        * https://www.aliexpress.com/item/4000271146538.html (9.87 EUR incl. shipping)
+        * https://www.aliexpress.com/item/32916521981.html (11.06 EUR incl. shipping)
+        * https://www.amazon.com/dp/B07G33YSJR (16.59 USD + 9.61 international shipping from USA)
+        * https://www.lightinthebox.com/en/p/_p8357432.html (out of stock)
 
         :param workplane: The CadQuery workplane to create this part on.
         :param measures: The measures to use for the parameters of this design. Expects a nested 
             [SimpleNamespace](https://docs.python.org/3/library/types.html#types.SimpleNamespace) 
             object.
 
+        .. todo:: Add the actual Mollemount interface elements to this design.
+        .. todo:: Add mockup parts for the Mollemount straps.
         .. todo:: Fix that the camera section cutout is slightly too narrow. Or rather, the corner 
             radius is too large in the design right now, which for concave corners like for this 
             cutout leads to too little material being removed.
@@ -225,8 +240,8 @@ measures = Measures(
     )
 )
 
-backplate = Backplate(cq.Workplane("XZ"), measures)
+caseplate = Caseplate(cq.Workplane("XZ"), measures)
 
 show_options = {"color": "lightgray", "alpha": 0}
-show_object(backplate.top, name = "backplate_top", options = show_options)
-show_object(backplate.bottom, name = "backplate_bottom", options = show_options)
+show_object(caseplate.top, name = "caseplate_top", options = show_options)
+show_object(caseplate.bottom, name = "caseplate_bottom", options = show_options)
