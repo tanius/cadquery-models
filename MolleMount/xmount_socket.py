@@ -4,6 +4,8 @@ import logging, importlib
 from types import SimpleNamespace as Measures
 import utilities # local directory import
 
+# Outline shape of an X-Mount Type M socket for smartphones and other small mobile devices.
+
 # Selective reloading to pick up changes made between script executions.
 # See: https://github.com/CadQuery/CQ-editor/issues/99#issue-525367146
 importlib.reload(utilities)
@@ -22,18 +24,17 @@ class XMountSocket:
 
     def __init__(self, workplane, measures):
         """
-        An Armor-X X-Mount shape; the newer version that includes a belt loop.
+        An Armor-X X-Mount Type M socket (the newer version that includes a loop for a strap).
 
-        So far this is only usable as a hole cutter part for such a shape, since the shape uses some 
-        shortcuts (no center cutout, smaller back cutout, no strap loop but only a bounding-box-like 
-        placeholder for it).
+        X-Mount is a mount system for mobile devices; see https://armor-x.com/. Type M (shown here) 
+        is meant for smartphones but has been discontinued by Armor-X and replaced with Type K. 
+        Type T is larger and meant for tablets, and as of 2021-05 is still in production. The 
+        socket part is to be glued to the mobile device, while the plug part (see xmount_plug.py) 
+        becomes part of the various mounts.
 
-        Note, do not use the X-Mount receptable with a magnet inserted if your mobile device has 
-        a pen digitizer (mostly Samsung Galaxy Note series). It will create an area of very low 
-        pressure sensitivity ("dead zone") of 20-50 mm diamater where the pen will hardly work. 
-        When removing the magnet, it's fine again. See: https://forum.xda-developers.com/t/.2288809
-        You can use a piece of ferrous metal instead of the magnet in the X-Mount receptable to 
-        still get some of the magnetic alignment function.
+        So far this design is only useful to cut holes for inserting an X-Mount socket, since the 
+        shape is not yet finished (no center cutout, smaller back cutout, no strap loop but only a 
+        bounding-box-like placeholder for it).
 
         :param workplane: The CadQuery workplane to create this part on.
         :param measures: The measures to use for the parameters of this design. Expects a nested 
@@ -188,7 +189,7 @@ class XMountSocket:
 
 
 # =============================================================================
-# Part Creation
+# Measures and Part Creation
 # =============================================================================
 cq.Workplane.part = utilities.part
 
@@ -273,4 +274,4 @@ measures = Measures(
 
 xmount_socket = cq.Workplane("XY").part(XMountSocket, measures)
 show_options = {"color": "lightgray", "alpha": 0}
-show_object(xmount, name = "xmount_socket", options = show_options)
+show_object(xmount_socket, name = "xmount_socket", options = show_options)

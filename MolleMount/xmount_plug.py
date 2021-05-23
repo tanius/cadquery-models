@@ -117,7 +117,7 @@ class XMountPlug:
             the mount still tries to delaminate the layers, but by pull rather than shear and with a 
             larger area. It might be better to directly go to the variant with a stainless steel 
             plate (see below).
-        .. todo:: Create a variant where the plate is missing and instead only two guiding 
+        .. todo:: Create a variant where the stem is missing and instead only two guiding 
             edges along the left and right cutout edges are present. The plate would then be 
             provided as a stainless steel or aluminium part made with an angle grinder, mounted 
             with a countersunk M3 bolt and a nut inserted into the part. With the current stem 
@@ -126,6 +126,22 @@ class XMountPlug:
             This variant should be much more durable, as the current one translates rattling on the 
             mobile device in its holder into shear action between the layers at the section where 
             the plate meets the stem.
+        .. todo:: Modify the holder to make it more durable when FDM 3D printed. The holders will 
+            then no longer be compatible with X-Mount Type-M, but that is no issue when both plug 
+            and socket are 3D printed and because all products with X-Mount Type-M have been 
+            discontinued anyway (and there are very few available used), so there is no benefit in 
+            keeping up that compatibility. The successor standard X-Mount Type-K should not be 
+            used as it's probably patent protected, and the Type-M mount should be modified enough 
+            to not fall under any patent protections. That allows commercial use of the design, then. 
+            Proposed improvements include:
+            (1) No cutout inside the plate. This is more durable, and magnets are not a good idea 
+            anyway as it interferes with smartphone pen digitizers. 
+            (2) a 45° chamfer instead of a horizontal lower surface of the plate, which will make it 
+            much less likely that the plate breaks and allows 3D printing upright without support; 
+            (3) a longer plate that inserts into a wedge-shaped socket purely horizontally, which 
+            will be more comfortable to insert without looking.
+            (4) a wider plate to have a single mount system for both smartphones and tablets, 
+            allowing to reuse the holders for all devices e.g. for car navigation.
         """
 
         cq.Workplane.combine_wires = utilities.combine_wires
