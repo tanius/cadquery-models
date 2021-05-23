@@ -2,15 +2,8 @@ import cadquery as cq
 import cadquery.selectors as cqs
 import logging, importlib
 from types import SimpleNamespace as Measures
-import xmount_socket # local directory import
-import utilities # local directory import
-
-# Selective reloading to pick up changes made between script executions.
-# See: https://github.com/CadQuery/CQ-editor/issues/99#issue-525367146
-importlib.reload(utilities)
 
 log = logging.getLogger(__name__)
-
 
 class Backplate:
 
@@ -132,15 +125,6 @@ class Backplate:
         )
         show_object(cutout_3, name = "cutout_3", options = {"color": "yellow", "alpha": 0.8})
 
-        cutout_xmount = (
-            cq.Workplane("XY")
-            .part(xmount_socket.XMountSocket, xmount_socket.measures)
-            .rotate((-1, 0, 0), (1, 0, 0), 90)
-            .translate([0.5 * m.width, 0, 0.5 * m.height])
-        )
-        show_object(cutout_xmount, name = "cutout_xmount", options = {"color": "yellow", "alpha": 0.8})
-
-
         self.model = (
             base_shape
             .union(reinforcement_1)
@@ -169,9 +153,6 @@ class Backplate:
             # TODO: Don't do the chamfer if the measure given is zero.
             # TODO: Also utilize back_edge_chamfer if present. If both are present, the part depth 
             #   has to be split half and half between them.
-
-            # Cut out the X-Mount shape.
-            .cut(cutout_xmount)
         )
 
         self.top = (
@@ -191,8 +172,6 @@ class Backplate:
 # =============================================================================
 # Part Creation
 # =============================================================================
-cq.Workplane.part = utilities.part
-
 measures = Measures(
     width = 69.50,
     height = 154.50, # Corrected from 155.20.
@@ -207,15 +186,15 @@ measures = Measures(
     # TODO: Due to a CAD kernel issue, the shape must not overlap with corners that are to be 
     # rounded afterwards. Otherwise no model can be calculated. This should be fixed at some time.
     reinforcement_1 = Measures(
-        depth = 2.30, # Maximum depth, used in the center of the part.
+        depth = 2.00, # Maximum depth, used in the center of the part.
 
-        bottom_left_1 = (0, 25.0), # Positioning the bottom of the truncated pyramid.
+        bottom_left_1 = (0, 3.0), # Positioning the bottom of the truncated pyramid.
         width_1 = 69.50, # The whole part width.
-        height_1 = 95.0,
+        height_1 = 121.0,
 
-        bottom_left_2 = (0.5 * (69.50 - 42.00), 40.0), 
+        bottom_left_2 = (0.5 * (69.50 - 42.00), 20.0), # Positioning the top of the truncated pyramid.
         width_2 = 42.00,
-        height_2 = 128.30 - 40.0 - 25.00, # Remaining height less 25 mm.
+        height_2 = 75.00,
     ),
 
     # All positions and sizes of cutout must use measures on the face pointing away from the device, 
@@ -247,7 +226,6 @@ measures = Measures(
 )
 
 backplate = Backplate(cq.Workplane("XZ"), measures)
-# cq.Workplane("XZ").part(Backplate, measures)
 
 show_options = {"color": "lightgray", "alpha": 0}
 show_object(backplate.top, name = "backplate_top", options = show_options)
