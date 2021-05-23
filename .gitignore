@@ -1,0 +1,9 @@
+# Ignore Python bytecode caching.
+__pycache__/
+
+# Ignore IDE configuration files.
+/.vscode/
+
+# Ignore build files (except STL, used for illustration of repo contents).
+*.3mf
+
