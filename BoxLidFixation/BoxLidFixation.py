@@ -6,6 +6,7 @@ measures = Measures(
     width = 55.0,
     depth = 8.0,
     height = 5.5,
+    # Use half the depth as depth to get a cylindrical shape. Bit less to prevent a CAD kernel error.
     radius = 3.99,
     hole_1 = Measures(
         position = 15.0,
