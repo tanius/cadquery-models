@@ -85,6 +85,7 @@ clip = (
     .tag("base_workplane")
     .center(0, -base_depth / 2)
 
+    # Add the clip itself.
     .union(
         clip_shape(
             wall_thickness = clip_wall_thickness, 
