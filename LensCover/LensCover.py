@@ -6,16 +6,44 @@ import utilities
 from types import SimpleNamespace as Measures
 from math import sin, cos, radians
 
-# An eye cover that can be hooked to the top edge of eyeglasses.
+# A parametric cover that can be hooked to the top edge of an eyeglasses lens.
+#
+# You might want to reduce the amount of light reaching the eye even more for practical use. For 
+# that, you can drill chains of small holes through the top face and the inclined face at the 
+# bottom and then sew flexible black material there. Cut the material so that it seals well against 
+# the user's face.
 #
 # To use this design, you need Python, CadQuery (https://cadquery.readthedocs.io/en/latest/) and 
 # ideally also CQ-Editor, the CadQuery IDE (https://github.com/CadQuery/CQ-editor).
 #
 # License: Unlicence and Creative Commons Public Domain Dedication (CC-0).
 #
+# Tasks for now
+# TODO: Rework the design so that it consists of a sweep operation along a single path, with wires 
+#     automatically swept orthogonal to the path. Wires are then defined as a parametrized hook 
+#     profile together with a position along that path in percent or millimeters from both ends. 
+#     In addition, the type of transition (ruled or round) between wires should be defined. The 
+#     problem is of course that sweeps always interpolate between wires with splines. So probably 
+#     lofting should be used, and the rounded path is only there to place the wires exactly, not to 
+#     sweep them along. The rounding is achieved by choosing round transition for lofting.
+# TODO: Replace the upper hook bar over the lens with two narrow hooks, also a bit shorter than now.
+# TODO: Remove the hook along the current stem cover part, keeping the hook infill though. This 
+#     should help attaching and detaching the lens cover.
+# TODO: Round the lower back corner, so it cannot poke into the head. This can be done by using 
+#     three profiles with "round" transition for lofting.
+# TODO: Cut off the lower right corner according to the manually cut prototype. This can be done 
+#     by using three profiles with "round" transition for lofting.
+# TODO: Add a top surface light blocker, carved according to the face contour. The shape should be 
+#     an arc, with the distance between arc and outer corner being 25 mm. Can be created from the 
+#     lens cover path and this arc, then extruding that face by 1.6 mm. Since this can easily be 
+#     3D printed, there is no reason to use other material.
+# 
 # Tasks for later
 # TODO: Add documentation for all methods.
-# TODO: Re-add corner rounding of the lower corners.
+# TODO: Reduce the size of this script by a lot by replacing all the *_start_wire() and *_end_wire() 
+#     methods with calls to a more general method. This requires proper specification of position 
+#     and rotation at once, possibly also by combining multiple other such positions and rotations.
+#     In CadQuery, the Location type is for that (or maybe it has a different name, but there is one).
 # TODO: Add the general edge chamfering. That's very impractical though for a design like this, 
 #     as edge selection is very difficult here.
 # TODO: Add sewing holes along the upper horizontal surface and on the lower 45° angled surface, 
