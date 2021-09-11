@@ -6,4 +6,6 @@ __pycache__/
 
 # Ignore build files (except STL, used for illustration of repo contents).
 *.3mf
-
+*.step
+*.FCStd
+*.svg
