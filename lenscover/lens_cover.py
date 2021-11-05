@@ -2,7 +2,7 @@ import cadquery as cq
 import cadquery.selectors as cqs
 import logging
 import importlib
-import utilities
+import utilities # TODO: Change to a relative import ".utilities" to preempt name clashes.
 from types import SimpleNamespace as Measures
 from math import sin, cos, radians
 

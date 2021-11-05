@@ -2,6 +2,9 @@ import cadquery as cq
 import logging
 from types import SimpleNamespace as Measures
 
+# A device for Auer Eurobox plastic boxes to help fix the lid in a closed position.
+# It protects against the lid sliding inwards when the box wall opposite of the lid latches bends.
+
 measures = Measures(
     width = 55.0,
     depth = 8.0,

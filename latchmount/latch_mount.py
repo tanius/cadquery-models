@@ -15,16 +15,16 @@ measures = Measures(
     ),
     baseplate = Measures(
         width = 79.0,
-        height = 38.0,
+        height = 38.0, # Same height as 1.5 inch butyl tape, used as seal and load distribution cushioning.
         depth = 17.0,
         left_chamfer = 8.5,
         right_chamfer = 5.0,
         holes_diameter = 4.0,
-        edge_groove_height = 1.4,
-        edge_groove_depth = 1.0, # Measured as 0.8±0.1 mm
+        edge_groove_height = 2.1, # 1.4 mm for latch, 0.5 mm b/c latch is 1 mm narrower than baseplate, 0.3 mm for tolerance.
+        edge_groove_depth = 1.2, # Measured as 0.8±0.1 mm. Some tolerance to make sure contact is at bolt positions.
     ),
     counterplate = Measures(
-        width = 89.0,
+        width = 92.5, # To the edge of the door / window pane on the outside. Depends on your frame type. Corrected from 89.0.
         width_offset = 0.0, # Offset of left edge against left edge of baseplate. For hole alignment.
         height_offset = 0.0, # Offset of top edge against top edge of baseplate. For hole alignment.
         height = 38.0,
@@ -68,6 +68,10 @@ class LatchMount:
         :param measures: The measures to use for the parameters of this design. Expects a nested 
             [SimpleNamespace](https://docs.python.org/3/library/types.html#types.SimpleNamespace) 
             object.
+
+        .. todo:: Add an option to add finger grip pits to the base plate, one on the top and 
+            one on the bottom. For cases where the baseplate is high enough (≥15 mm), this 
+            provides a good way to pull a door or window pane shut in order to close the latch.
         """
 
         # workplane is unused while building the model, and only utilized towards the end 
