@@ -11,7 +11,7 @@ measures = Measures(
         upper_depth = 94.0, # Twice the size of the original toilet seat supports.
         front_height = 16.6,
         back_height = 19.1,
-        edge_radius = 3.0,
+        lower_edge_radius = 3.0,
     ),
     hole_1 = Measures(
         position = 23.5,

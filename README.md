@@ -20,13 +20,13 @@ Content by folder:
 
 * **`experiments`.** Various own experiments with CadQuery features and prototypes of added features. Also experiments with how to organize CadQuery Python code well.
 
-* **`footblock`.** # A parametric foot block / spacer block.
+* **`footblock`.** A parametric foot block / spacer block.
 
 * **`latchmount`.** A parametric mount for a deadbolt latch, consisting of baseplate and counterplate.
 
-* **`lenscover`.** # A parametric cover that can be hooked to the top edge of an eyeglasses lens.
+* **`lenscover`.** A parametric cover that can be hooked to the top edge of an eyeglasses lens.
 
-* **`lidfixer`.** # A device for Auer Eurobox plastic boxes to help fix the lid in a closed position.
+* **`lidfixer`.** A device for Auer Eurobox plastic boxes to help fix the lid in a closed position.
 
 * **`mollemount`.** A parametric backplate for cases of smartphones and phablets with a Mollemount interface. Mollemount is a device mount system of my own design, using the PALS loops known from military backpacks and carry equipment.
 

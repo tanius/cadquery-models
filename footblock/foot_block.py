@@ -34,45 +34,100 @@ m = measures_module.measures
 # Can be used for example for: furniture feet, toilet seat supports, glider feet for chairs, 
 # feet for boxes, bumpers for various items.
 #
-# TODO Rename m.edge_radius to m.lower_edge_radius.
+# TODO Support to create small studs on the side walls inside the recess, to position the foot block 
+#   centered around the original foot, guaranteeing equal glue thickness. However, this might not 
+#   be needed in practice.
+# TODO Switch to using different corner radii on top and bottom surface, with the adaptive fillet 
+#   automatically created via the lofting. This allows to have a half-circle end on both ends, and 
+#   on both top and bottom.
 # TODO As an alternative to m.lower_width and m.upper_width, also support m.width for when both are 
 #   the same measure. Then internally, set m.lower_width and m.upper_width accordingly. And similarly 
 #   for the other pairs of related parameters.
 
-# Calculating derived measures.
-if getattr(m, 'hole_1', None) is None: m.hole_1 = None # Make sure key exists.
-if getattr(m, 'hole_2', None) is None: m.hole_2 = None # Make sure key exists.
+# Make sure SimpleNamespace attributes keys exist for unused configuration parameters.
+if getattr(m, 'recess', None) is None: m.recess = None
+if getattr(m, 'hole_1', None) is None: m.hole_1 = None
+if getattr(m, 'hole_2', None) is None: m.hole_2 = None
+if getattr(m, 'parts', None) is None: m.parts = "all"
+if getattr(m.block, 'corner_radius_front', None) is None: m.block.corner_radius_front = 0.0
+if getattr(m.block, 'corner_radius_back', None) is None: m.block.corner_radius_back = 0.0
+if getattr(m.block, 'lower_edge_radius', None) is None: m.block.lower_edge_radius = 0.0
+if getattr(m.recess, 'backfill_section_height', None) is None: m.recess.backfill_section_height = 0.0
+if getattr(m.recess, 'backfill_section_depth', None) is None: m.recess.backfill_section_depth = 0.0
+
+# Calculate derived measures.
 # Note, upper_depth is measured along the sloped surface, not the axis direction. So use asin(), not atan().
 m.block.slope_angle = degrees(asin((m.block.back_height - m.block.front_height) / m.block.upper_depth))
-if getattr(m, 'corner_radius_front', None) is None:
-    m.block.corner_radius_front = (min(m.block.lower_width, m.block.upper_width) - 0.5) / 2
-if getattr(m, 'corner_radius_back', None) is None:
-    m.block.corner_radius_back = (min(m.block.lower_width, m.block.upper_width)  - 0.5) / 2
+m.block.width = max(m.block.upper_width, m.block.lower_width)
+m.block.depth = max(m.block.upper_depth, m.block.lower_depth)
+m.block.height = max(m.block.front_height, m.block.back_height)
 
-# Creating the CAD model.
+# Create the foot block base shape.
 model = (
     cq.Workplane("XY")
 
     # Lower face, always resting horizontally on the floor or on another object.
-    .move(xDist = -m.block.lower_width / 2, yDist = max(0, (m.block.upper_depth - m.block.lower_depth) / 2))
-    .rect(m.block.lower_width, m.block.lower_depth, centered = False)
-    # TODO: Fix that centered = (True, False) does not work in CadQuery, 
-    # then use that instead of the .move().
+    .center(x = 0, y = 0.5 * m.block.depth)
+    .rect(m.block.lower_width, m.block.lower_depth, centered = True)
 
     # Upper face, on which the foot block is mounted to its object.
     .transformed(offset = (0, 0, m.block.front_height), rotate = (m.block.slope_angle, 0, 0))
-    .move(xDist = -m.block.upper_width / 2, yDist = max(0, (m.block.lower_depth - m.block.upper_depth) / 2))
-    .rect(m.block.upper_width, m.block.upper_depth, centered = False)
+    .tag("upper_face_workplane")
+    .rect(m.block.upper_width, m.block.upper_depth, centered = True)
 
     .loft()
-
-    # Round the front and back corners.
-    .edges("(not |Y) and (not |X)").edges("<Y").fillet(m.block.corner_radius_front)
-    .edges("(not |Y) and (not |X)").edges(">Y").fillet(m.block.corner_radius_back)
-
-    # Round the lower edges.
-    .faces("<Z").edges().fillet(m.block.edge_radius)
 )
+
+# Round the front and back corners and lower edge, where necessary.
+if m.block.corner_radius_front > 0:
+    model = model.edges("(not |Y) and (not |X)").edges("<Y").fillet(m.block.corner_radius_front)
+if m.block.corner_radius_back > 0:
+    model = model.edges("(not |Y) and (not |X)").edges(">Y").fillet(m.block.corner_radius_back)
+if m.block.lower_edge_radius > 0:
+    model = model.faces("<Z").edges().fillet(m.block.lower_edge_radius)
+
+# Create the recess shape and cut the recess into the model.
+if m.recess is not None:
+    recess = (
+        model
+
+        # Upper face, created in the workplane of the foot block's upper face.
+        .workplaneFromTagged("upper_face_workplane")
+        .rect(m.recess.upper_width, m.recess.upper_depth, centered = True)
+
+        # Lower face.
+        .transformed(offset = (0, 0, -m.recess.height))
+        .tag("recess_bottom_workplane")
+        .rect(m.recess.lower_width, m.recess.lower_depth, centered = True)
+
+        .loft(combine = False) # Replaces foot block parent solid, instead of combining with it.
+    )
+
+    # Reduce the recess by a backfill section in its bottom center, if needed.
+    if m.recess.backfill_section_height > 0.0 and m.recess.backfill_section_depth > 0.0:
+        recess = (
+            recess
+            .workplaneFromTagged("recess_bottom_workplane")
+            .rect(m.recess.upper_width, m.recess.backfill_section_depth, centered = True)
+            .cutBlind(m.recess.backfill_section_height)
+
+            # Round the lower edges.
+            .faces("<Z[-2]").edges("<X or >X").fillet(m.recess.backfill_edge_radius)
+        )
+
+    # Round the corners and lower edges of the recess base shape.
+    # (Rounding lower edges must be done after the backfilling, as otherwise overlapping fillets 
+    # lead to CAD kernel crashes.)
+    recess = (
+        recess
+        # Round the corners.
+        .edges("(not |Y) and (not |X)").edges("<Y or >Y").fillet(m.recess.corner_radius)
+        # Round the lower edges.
+        .faces("<Z").edges("(not |X) or (<Y or >Y)").fillet(m.recess.lower_edge_radius)
+    )
+
+    # Cut the recess into the model.
+    model = model.cut(recess)
 
 # Drill the mounting holes, if so desired.
 if m.hole_1 is not None:
@@ -85,7 +140,6 @@ if m.hole_1 is not None:
         .pushPoints([(0, -m.hole_1.position)]) # Negative coordinate due to inverted plane.
         .cskHole(m.hole_1.hole_size, m.hole_1.head_size, m.hole_1.head_angle)
     )
-
 if m.hole_2 is not None:
     model = (
         model
@@ -97,6 +151,22 @@ if m.hole_2 is not None:
         .cskHole(m.hole_2.hole_size, m.hole_2.head_size, m.hole_2.head_angle)
     )
 
-# Displaying the CAD model. Only works when opening the file in CQ-Editor.
-show_options = {"color": "lightgray", "alpha": 0}
+# Split the model in half (for 3D printing), if desired.
+if m.parts != "all":
+    model = (
+        model
+        .copyWorkplane(cq.Workplane("XZ").workplane(invert = True))
+        .workplane(offset = 0.5 * m.block.depth)
+    )
+    model = model.split(
+        keepBottom = True if m.parts == "front half" else False,
+        keepTop =    True if m.parts == "back half"  else False,
+    )
+
+# Display the recess shape. (Debug only.)
+# show_options = {"color": "red", "alpha": 0}
+# show_object(recess, name = "recess", options = show_options)
+
+# Display the CAD model. Only works when opening the file in CQ-Editor.
+show_options = {"color": "lightgray", "alpha": 0.0}
 show_object(model, name = "model", options = show_options)
