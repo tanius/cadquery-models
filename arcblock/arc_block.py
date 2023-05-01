@@ -13,7 +13,7 @@ m = Measures(
     linear_width = 50.0,
     depth = 15.0,
     height = 15.0,
-    arc_outer_diameter = 370.0,
+    arc_outer_diameter = 100.0,
     top_fillets = 3.7,
     vertical_fillets = 2.5,
     
@@ -21,9 +21,9 @@ m = Measures(
     # TODO: Calculate hole positions on the arc centerline based on fractions of the arc angle (say, at 30% and 70%).
     holes = Measures(
         hole_1_width_offset = 15.0,
-        hole_1_depth_offset = 1.5,
+        hole_1_depth_offset = 7.0,
         hole_2_width_offset = 35.0,
-        hole_2_depth_offset = 1.5,
+        hole_2_depth_offset = 7.0,
         head_diameter = 7.0,
         head_height = 4.0,
         bolt_diameter = 4.2
