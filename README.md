@@ -12,6 +12,8 @@ Each subfolder is its own independent Python package and contains a single desig
 
 Content by folder:
 
+* **`arcblock`.** A parametric, arc-shaped block with bolt holes. For example as furniture foot, guide or similar.
+
 * **`case`.** A parametric, cuboid case made from six overlapping wall panels.
 
 * **`chuteloft`.** A paremetric chute created from a loft between two U-shaped profiles.
@@ -20,7 +22,7 @@ Content by folder:
 
 * **`experiments`.** Various own experiments with CadQuery features and prototypes of added features. Also experiments with how to organize CadQuery Python code well.
 
-* **`footblock`.** A parametric foot block / spacer block.
+* **`footblock`.** A parametric cuboid foot block or spacer block with bolt holes. Optionally ramp shaped.
 
 * **`latchmount`.** A parametric mount for a deadbolt latch, consisting of baseplate and counterplate.
 
