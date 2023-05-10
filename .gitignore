@@ -4,8 +4,11 @@ __pycache__/
 # Ignore IDE configuration files.
 /.vscode/
 
-# Ignore build files (except STL, used for illustration of repo contents).
+# Ignore build files (except STL, used for model illustration).
 *.3mf
 *.step
 *.FCStd
 *.svg
+
+# Ignore specific STL files that are not used for model illustration.
+/zspacer/z_spacer_*.stl

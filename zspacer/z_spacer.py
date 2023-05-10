@@ -20,20 +20,25 @@ from types import SimpleNamespace as Measures
 
 m = Measures(
     width = 15.0,
-    mountplate_depth= 2.4,
-    spacer_depth = 5.2,
-    mountplate_height = 21.0,
-    spacer_height = 4.0,
+    mountplate_thickness = 2.8,
+    spacer_depth = 6.8,        # Corresponds to full lower width of an "L" profile.
+    mountplate_height = 18.0,  # Corresponds to inside height of an "L" profile.
+    spacer_thickness = 3.0,
     top_radius = 4.0
 )
 
 model = (
+    # Spacer
     cq.Workplane("XY")
     .rect(m.width, m.spacer_depth)
-    .extrude(m.spacer_height)
-    .center(0, -0.5 * m.spacer_depth)
-    .rect(m.width, m.mountplate_depth)
+    .extrude(m.spacer_thickness)
+    
+    # Mountplate
+    .workplane(0.5 * m.spacer_thickness, origin = (0, -0.5 * m.spacer_depth + 0.5 * m.mountplate_thickness))
+    .rect(m.width, m.mountplate_thickness)
     .extrude(m.mountplate_height)
+    
+    # Top corner fillets
     .edges("|Y").edges(">Z")
     .fillet(m.top_radius)
 )
